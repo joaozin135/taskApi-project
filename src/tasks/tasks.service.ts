@@ -1,0 +1,29 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { Task } from './model/task.model';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { TaskStatus } from './enums/task-status.enum';
+import { UsersService } from 'src/users/users.service';
+
+@Injectable()
+export class TasksService {
+    private tasks: Task[] = [];
+    constructor(private readonly userService: UsersService){}
+        create (dto:CreateTaskDto): Task{
+            const users = this.userService.findAll();
+            const userExiste = users.find(u=> u.id === dto.userId);
+            if(!userExiste) 
+                throw new NotFoundException("ID não encontrado")
+            const newTask: Task ={
+                id: randomUUID(),
+                title: dto.title,
+                description: dto.description,
+                status: TaskStatus.TODO,
+                userId: dto.userId
+            }
+            this.tasks.push(newTask);
+            return newTask
+        }
+        findAll(): Task[] {return this.tasks}
+    }
+
