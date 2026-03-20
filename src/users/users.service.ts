@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID, createHash } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './models/user.model';
@@ -19,7 +19,15 @@ export class UsersService {
         const{passwordHash, ...userSemPassword} = newUser;
         return userSemPassword;
     }
-    findAll(){
+    /*findAll(){
         return this.users.map(({passwordHash, ...safeUser})=> safeUser);
+    }*/
+
+    findOne(id: string): User {
+        const user = this.users.find((u) => u.id === id); 
+        if(!user){
+            throw new NotFoundException(`Usuario com ID ${id} não encontrado.`);
+        }
+        return user;
     }
 }
